@@ -5,6 +5,9 @@ MiMu gloves - theglovesproject.com
 
 http://www.youtube.com/watch?v=v2hjkVig_78
 
+#Abstract
+Inspired by MiMu gloves, a type of glove that can not only play sounds but also modify and alter them onstage, our Music Bender Glove will allow us to control music with our hands. The Music Bender Glove, or MBG, will use flexion sensors as triggers to play musical notes. As the user bends his or her fingers while wearing the glove, different notes will play, each corresponding to one finger. Once the user passes a certain degree of bending threshold, the program will register that the finger is indeed bent and play a note. However, for our initial prototype only one note will be played at any one time. Additionally, the user will be able to adjust the pitch of the note using sliders. To construct this we will use five 2.2” flex sensors, a glove, an Arduino Uno, and a DangerShield. For future improvements, we could add the interface of hand orientation using a gyro or accelerometer, as well as the ability to play multiple notes at once. 
+
 #Rough description
 
 We are proposing the design of a flexion-activated glove to produce sound and possibly light. The MIDI glove will play a different note upon the flexion of each separate finger on the user’s hand, as well as possibly provide a visual indication with LEDs.
@@ -25,4 +28,3 @@ Flashing LEDs
 Playing multiple notes at once (might need multiple speakers)
 
 Make the whole system portable
-
