@@ -73,40 +73,40 @@ while True:
 		if values[7] == 0 and values[8] == 0:
 			
 			if values[5] == 0:
-				if values[6] == 1 and notePlayed == False:
+				if values[6] == 1 and notePlayed[0] == False:
 					pygame.mixer.music.load("C5.wav")
 					pygame.mixer.music.play()
 					notePlayed[0] = True
-				if values[6] == 2 and notePlayed == False:
+				if values[6] == 2 and notePlayed[1] == False:
 					pygame.mixer.music.load("D5.wav")
 					pygame.mixer.music.play()
 					notePlayed[1] = True
-				if values[6] == 3 and notePlayed == False:
+				if values[6] == 3 and notePlayed[2] == False:
 					pygame.mixer.music.load("E5.wav")
 					pygame.mixer.music.play()
 					notePlayed[2] = True
-				if values[6] == 4 and notePlayed == False:
+				if values[6] == 4 and notePlayed[3] == False:
 					pygame.mixer.music.load("F5.wav")
 					pygame.mixer.music.play()
 					notePlayed[3] = True
 			elif values[5] == 1:
-				if values[6] == 1 and notePlayed == False:
+				if values[6] == 1 and notePlayed[0] == False:
 					pygame.mixer.music.load("G5.wav")
 					pygame.mixer.music.play()
 					notePlayed[0] = True
-				if values[6] == 2 and notePlayed == False:
+				if values[6] == 2 and notePlayed[1] == False:
 					pygame.mixer.music.load("A5.wav")
 					pygame.mixer.music.play()
 					notePlayed[1] = True
-				if values[6] == 3 and notePlayed == False:
+				if values[6] == 3 and notePlayed[2] == False:
 					pygame.mixer.music.load("B5.wav")
 					pygame.mixer.music.play()
 					notePlayed[2] = True
-				if values[6] == 4 and notePlayed == False:
+				if values[6] == 4 and notePlayed[3] == False:
 					pygame.mixer.music.load("C6.wav")
 					pygame.mixer.music.play()
 					notePlayed[3] = True
-			for x in range(0:3):
+			for x in range(0,4):
 				if threshMet[x] == False:
 					notePlayed[x] = False
 
