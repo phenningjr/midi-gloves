@@ -51,13 +51,53 @@ while True:
 			values[counter] = int(x)
 			counter = counter + 1
 		threshMet = checkThresholds(values)
-		if gun_ready == True and threshMet[2] and threshMet[3] and threshMet[1] and values[7] == 1 and values[8] == 0:
-			print("AHHHH")
-			gun_ready = False
-			pygame.mixer.music.load("gun.wav")
-			pygame.mixer.music.play()
-		if threshMet[1] == False:
-			gun_ready = True
+	
+		if values[7] == 0:
+			notePlayed = False
+			if values[5] == 0:
+				if values[6] == 1 and notePlayed == False:
+					pygame.mixer.music.load("C5.wav")
+					pygame.mixer.music.play()
+					notePlayed = True
+				if values[6] == 2 and notePlayed == False:
+					pygame.mixer.music.load("D5.wav")
+					pygame.mixer.music.play()
+					notePlayed = True
+				if values[6] == 3 and notePlayed == False:
+					pygame.mixer.music.load("E5.wav")
+					pygame.mixer.music.play()
+					notePlayed = True
+				if values[6] == 4 and notePlayed == False:
+					pygame.mixer.music.load("F5.wav")
+					pygame.mixer.music.play()
+					notePlayed = True
+			elif values[5] == 1:
+				if values[6] == 1 and notePlayed == False:
+					pygame.mixer.music.load("G5.wav")
+					pygame.mixer.music.play()
+					notePlayed = True
+				if values[6] == 2 and notePlayed == False:
+					pygame.mixer.music.load("A5.wav")
+					pygame.mixer.music.play()
+					notePlayed = True
+				if values[6] == 3 and notePlayed == False:
+					pygame.mixer.music.load("B5.wav")
+					pygame.mixer.music.play()
+					notePlayed = True
+				if values[6] == 4 and notePlayed == False:
+					pygame.mixer.music.load("C6.wav")
+					pygame.mixer.music.play()
+					notePlayed = True
+
+		
+		elif values[7] == 1:
+			if gun_ready == True and threshMet[2] and threshMet[3] and threshMet[1] and values[8] == 0:
+				print("AHHHH")
+				gun_ready = False
+				pygame.mixer.music.load("gun.wav")
+				pygame.mixer.music.play()
+			if threshMet[1] == False:
+				gun_ready = True
 	
 
 
