@@ -99,8 +99,8 @@ int buzzer = 12;
 int threshold = 350;
 int threshold2 = 350;
 int threshold3 = 330;
-int threshold4 = 370;
-int threshold5 = 400;
+int threshold4 = 320;
+int threshold5 = 380;
 
 boolean Down = false;
 boolean Down2 = false;
