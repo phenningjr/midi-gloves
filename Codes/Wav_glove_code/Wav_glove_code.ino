@@ -89,18 +89,25 @@
 #define NOTE_D8  4699
 #define NOTE_DS8 4978
 
+// ACCL STUFF
+#include<Wire.h>
+const int MPU=0x68;  // I2C address of the MPU-6050
+int16_t AcX,AcY,AcZ,Tmp,GyX,GyY,GyZ;
+long sumAcX, sumAcY, sumAcZ, sumTmp, sumGyX, sumGyY, sumGyZ;
+int counter = 0;
+
 int vout = 2;
 int vout2 = 4;
 int vout3 = 7;
 int vout4 = 8;
-int vout5 = 12;
-int buzzer = 13;
+int vout5 = 13;
+int buzzer = 12;
 
 int threshold = 350;
 int threshold2 = 350;
 int threshold3 = 330;
-int threshold4 = 370;
-int threshold5 = 400;
+int threshold4 = 320;
+int threshold5 = 380;
 
 boolean Down = false;
 boolean Down2 = false;
@@ -108,11 +115,21 @@ boolean Down3 = false;
 boolean Down4 = false;
 boolean Down5 = false;
 boolean allDown = false;
+
+int modeJustChanged = 0;
+
 int notes[8] = {
   NOTE_G4, NOTE_A4, NOTE_B4, NOTE_C5, NOTE_D5, NOTE_E5, NOTE_FS5, NOTE_G5};
 int octave = 0;
 
 int mode = 0;
+
+unsigned int AcX_avg;
+unsigned int AcY_avg;
+unsigned int AcZ_avg;
+unsigned int GyX_avg;
+unsigned int GyY_avg;
+unsigned int GyZ_avg;
 
 
 void setup() 
@@ -131,10 +148,86 @@ void setup()
   digitalWrite(vout4, HIGH);
   digitalWrite(vout5, HIGH);
 
+  // ACCL STUFF
+  Wire.begin();
+  Wire.beginTransmission(MPU);
+  Wire.write(0x6B);  // PWR_MGMT_1 register
+  Wire.write(0);     // set to zero (wakes up the MPU-6050)
+  Wire.endTransmission(true);
+
 }
 
 void loop() 
 {
+  // ACCELEROMETER STUFF
+  // The following lines serve to get the values from the accelerometer.
+
+  Wire.beginTransmission(MPU);
+  Wire.write(0x3B);  // starting with register 0x3B (ACCEL_XOUT_H)
+  Wire.endTransmission(false);
+  Wire.requestFrom(MPU,14,true);  // request a total of 14 registers
+  AcX=Wire.read()<<8|Wire.read();  // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)     
+  AcY=Wire.read()<<8|Wire.read();  // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
+  AcZ=Wire.read()<<8|Wire.read();  // 0x3F (ACCEL_ZOUT_H) & 0x40 (ACCEL_ZOUT_L)
+  Tmp=Wire.read()<<8|Wire.read();  // 0x41 (TEMP_OUT_H) & 0x42 (TEMP_OUT_L)
+  GyX=Wire.read()<<8|Wire.read();  // 0x43 (GYRO_XOUT_H) & 0x44 (GYRO_XOUT_L)
+  GyY=Wire.read()<<8|Wire.read();  // 0x45 (GYRO_YOUT_H) & 0x46 (GYRO_YOUT_L)
+  GyZ=Wire.read()<<8|Wire.read();  // 0x47 (GYRO_ZOUT_H) & 0x48 (GYRO_ZOUT_L)
+
+  sumAcX = sumAcX + AcX;
+  sumAcY = sumAcY + AcY;
+  sumAcZ = sumAcZ + AcZ;
+  sumTmp = sumTmp + Tmp;
+  sumGyX = sumGyX + GyX;
+  sumGyY = sumGyY + GyY;
+  sumGyZ = sumGyZ + GyZ;
+
+
+
+  if (counter == 100)
+  { 
+    /*
+    Serial.print("AcX = "); Serial.print(sumAcX/counter);
+     Serial.print(" | AcY = "); Serial.print(sumAcY/counter);
+     Serial.print(" | AcZ = "); Serial.print(sumAcZ/counter);
+     Serial.print(" | Tmp = "); Serial.print(sumTmp/counter/340.00+36.53);  //equation for temperature in degrees C from datasheet
+     Serial.print(" | GyX = "); 
+     Serial.print(sumGyX/counter);
+     Serial.print(" ");
+     Serial.print(" | GyY = "); 
+     Serial.print(sumGyY/counter);
+     Serial.print(" ");
+     Serial.print(" | GyZ = "); 
+     Serial.println(sumGyZ/counter);
+     */
+
+    // These values are used to output to the python code,
+    // since we can't send 0's as that will mess up readings.
+    // These will simply be updated each time the averages are done.
+    AcX_avg = (sumAcX/counter);
+    AcY_avg = (sumAcY/counter);
+    AcZ_avg = (sumAcZ/counter);
+    GyX_avg = (sumGyX/counter);
+    GyY_avg = (sumGyY/counter);
+    GyZ_avg = (sumGyZ/counter);
+
+    counter = 0;
+    sumAcX = 0;
+    sumAcY = 0;
+    sumAcZ = 0;
+    sumTmp = 0;
+    sumGyX = 0;
+    sumGyY = 0;
+    sumGyZ = 0;
+  }
+  else
+  {
+    counter = counter + 1; 
+  }
+  delay(3);
+
+  // WAV CONTROL STUFF
+  // The following lines handle the control of note playing and mode changes.
   int notePlaying = 0;
   int reading = 0;
   int reading2 = 0;
@@ -142,11 +235,11 @@ void loop()
   int reading4 = 0;
   int reading5 = 0;
 
-  reading = analogRead(0);
-  reading2 = analogRead(1);
-  reading3 = analogRead(2);
-  reading4 = analogRead(3);
-  reading5 = analogRead(4);
+  reading = analogRead(2);
+  reading2 = analogRead(5);
+  reading3 = analogRead(1);
+  reading4 = analogRead(4);
+  reading5 = analogRead(3);
 
   if (reading < threshold)
   {
@@ -155,6 +248,7 @@ void loop()
   else
   {
     Down = false; 
+    modeJustChanged = 0;
   }
   if (reading2 < threshold2)
   {
@@ -163,6 +257,7 @@ void loop()
   else
   {
     Down2 = false; 
+    modeJustChanged = 0;
   }
   if (reading3 < threshold3)
   {
@@ -171,6 +266,7 @@ void loop()
   else
   {
     Down3 = false; 
+    modeJustChanged = 0;
   }
   if (reading4 < threshold4)
   {
@@ -179,6 +275,7 @@ void loop()
   else
   {
     Down4 = false; 
+    modeJustChanged = 0;
   }
   if (reading5 < threshold5 && Down5 == false)
   {
@@ -195,11 +292,15 @@ void loop()
 
   if (Down && Down2 && Down3 && Down4 && allDown == false)
   {
-      allDown = true;
-      if (mode == 0) 
-        mode = 1;
-     else if (mode == 1) 
-       mode = 0; 
+    allDown = true;
+    if (mode == 0) 
+      mode = 1;
+    else if (mode == 1) 
+      mode = 2;
+    else if (mode == 2)
+      mode = 0; 
+    modeJustChanged = 1;
+
 
   } 
   else if (!Down || !Down2 || !Down3 || !Down4 && allDown == true)
@@ -226,6 +327,7 @@ void loop()
       notePlaying = 4;
     } 
   }
+
   else
   {
     if (!Down && notePlaying == 1 || !Down2 && notePlaying == 2 || !Down3 && notePlaying == 3 || !Down4 && notePlaying == 4)
@@ -234,7 +336,7 @@ void loop()
     } 
   }
 
-  if (mode == 0)
+  if (mode == 0 && modeJustChanged == 0)
   {
     switch (notePlaying)
     {
@@ -255,7 +357,7 @@ void loop()
       break;
     }
   }
-  else if (mode == 1)
+  else if (mode == 1 && modeJustChanged == 0)
   {
     switch (notePlaying)
     {
@@ -279,10 +381,16 @@ void loop()
 
 
   String strOutput = " ";
-  strOutput = (reading + strOutput + reading2 + strOutput + reading3 + strOutput + reading4 + strOutput + reading5 + strOutput + octave + strOutput + notePlaying + strOutput + mode);
+  strOutput = (reading + strOutput + reading2 + strOutput + reading3 + strOutput + reading4 + strOutput + reading5 + 
+    strOutput + octave + strOutput + notePlaying + strOutput + mode + strOutput + modeJustChanged  + strOutput + 
+    AcX_avg + strOutput + AcY_avg + strOutput + AcZ_avg + strOutput + 
+    GyX_avg + strOutput + GyY_avg + strOutput + GyZ_avg);
 
   Serial.println (strOutput);
 
-
 }
+
+
+
+
 
