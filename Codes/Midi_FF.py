@@ -188,7 +188,7 @@ while True:
 				volLevel = 1
 
 			channel.set_volume(volLevel)
-
+			print volLevel
 
 		#MARACA(S) MODE
 

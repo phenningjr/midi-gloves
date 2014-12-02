@@ -89,6 +89,13 @@
 #define NOTE_D8  4699
 #define NOTE_DS8 4978
 
+// ACCL STUFF
+#include<Wire.h>
+const int MPU=0x68;  // I2C address of the MPU-6050
+int16_t AcX,AcY,AcZ,Tmp,GyX,GyY,GyZ;
+long sumAcX, sumAcY, sumAcZ, sumTmp, sumGyX, sumGyY, sumGyZ;
+int counter = 0;
+
 int vout = 2;
 int vout2 = 4;
 int vout3 = 7;
