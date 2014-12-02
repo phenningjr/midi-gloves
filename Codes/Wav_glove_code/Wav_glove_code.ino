@@ -122,7 +122,7 @@ int notes[8] = {
   NOTE_G4, NOTE_A4, NOTE_B4, NOTE_C5, NOTE_D5, NOTE_E5, NOTE_FS5, NOTE_G5};
 int octave = 0;
 
-int mode = 0;
+int mode = 4;
 
 unsigned int AcX_avg;
 unsigned int AcY_avg;
@@ -162,30 +162,37 @@ void loop()
   // ACCELEROMETER STUFF
   // The following lines serve to get the values from the accelerometer.
 
-  Wire.beginTransmission(MPU);
-  Wire.write(0x3B);  // starting with register 0x3B (ACCEL_XOUT_H)
-  Wire.endTransmission(false);
-  Wire.requestFrom(MPU,14,true);  // request a total of 14 registers
-  AcX=Wire.read()<<8|Wire.read();  // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)     
-  AcY=Wire.read()<<8|Wire.read();  // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
-  AcZ=Wire.read()<<8|Wire.read();  // 0x3F (ACCEL_ZOUT_H) & 0x40 (ACCEL_ZOUT_L)
-  Tmp=Wire.read()<<8|Wire.read();  // 0x41 (TEMP_OUT_H) & 0x42 (TEMP_OUT_L)
-  GyX=Wire.read()<<8|Wire.read();  // 0x43 (GYRO_XOUT_H) & 0x44 (GYRO_XOUT_L)
-  GyY=Wire.read()<<8|Wire.read();  // 0x45 (GYRO_YOUT_H) & 0x46 (GYRO_YOUT_L)
-  GyZ=Wire.read()<<8|Wire.read();  // 0x47 (GYRO_ZOUT_H) & 0x48 (GYRO_ZOUT_L)
+  counter = 0;
+  sumAcX = 0;
+  sumAcY = 0;
+  sumAcZ = 0;
+  sumTmp = 0;
+  sumGyX = 0;
+  sumGyY = 0;
+  sumGyZ = 0;
 
-  sumAcX = sumAcX + AcX;
-  sumAcY = sumAcY + AcY;
-  sumAcZ = sumAcZ + AcZ;
-  sumTmp = sumTmp + Tmp;
-  sumGyX = sumGyX + GyX;
-  sumGyY = sumGyY + GyY;
-  sumGyZ = sumGyZ + GyZ;
-
-
-
-  if (counter == 100)
+  for (int counter = 0; counter < 50; counter++)
   { 
+    Wire.beginTransmission(MPU);
+    Wire.write(0x3B);  // starting with register 0x3B (ACCEL_XOUT_H)
+    Wire.endTransmission(false);
+    Wire.requestFrom(MPU,14,true);  // request a total of 14 registers
+    AcX=Wire.read()<<8|Wire.read();  // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)     
+    AcY=Wire.read()<<8|Wire.read();  // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
+    AcZ=Wire.read()<<8|Wire.read();  // 0x3F (ACCEL_ZOUT_H) & 0x40 (ACCEL_ZOUT_L)
+    Tmp=Wire.read()<<8|Wire.read();  // 0x41 (TEMP_OUT_H) & 0x42 (TEMP_OUT_L)
+    GyX=Wire.read()<<8|Wire.read();  // 0x43 (GYRO_XOUT_H) & 0x44 (GYRO_XOUT_L)
+    GyY=Wire.read()<<8|Wire.read();  // 0x45 (GYRO_YOUT_H) & 0x46 (GYRO_YOUT_L)
+    GyZ=Wire.read()<<8|Wire.read();  // 0x47 (GYRO_ZOUT_H) & 0x48 (GYRO_ZOUT_L)
+
+    sumAcX = sumAcX + AcX;
+    sumAcY = sumAcY + AcY;
+    sumAcZ = sumAcZ + AcZ;
+    sumTmp = sumTmp + Tmp;
+    sumGyX = sumGyX + GyX;
+    sumGyY = sumGyY + GyY;
+    sumGyZ = sumGyZ + GyZ;
+
     /*
     Serial.print("AcX = "); Serial.print(sumAcX/counter);
      Serial.print(" | AcY = "); Serial.print(sumAcY/counter);
@@ -201,30 +208,19 @@ void loop()
      Serial.println(sumGyZ/counter);
      */
 
-    // These values are used to output to the python code,
-    // since we can't send 0's as that will mess up readings.
-    // These will simply be updated each time the averages are done.
-    AcX_avg = (sumAcX/counter);
-    AcY_avg = (sumAcY/counter);
-    AcZ_avg = (sumAcZ/counter);
-    GyX_avg = (sumGyX/counter);
-    GyY_avg = (sumGyY/counter);
-    GyZ_avg = (sumGyZ/counter);
-
-    counter = 0;
-    sumAcX = 0;
-    sumAcY = 0;
-    sumAcZ = 0;
-    sumTmp = 0;
-    sumGyX = 0;
-    sumGyY = 0;
-    sumGyZ = 0;
+    if (counter == 49)
+    {
+      // These values are used to output to the python code,
+      // since we can't send 0's as that will mess up readings.
+      // These will simply be updated each time the averages are done.
+      AcX_avg = (sumAcX/counter);
+      AcY_avg = (sumAcY/counter);
+      AcZ_avg = (sumAcZ/counter);
+      GyX_avg = (sumGyX/counter);
+      GyY_avg = (sumGyY/counter);
+      GyZ_avg = (sumGyZ/counter);
+    }
   }
-  else
-  {
-    counter = counter + 1; 
-  }
-  delay(3);
 
   // WAV CONTROL STUFF
   // The following lines handle the control of note playing and mode changes.
@@ -298,6 +294,10 @@ void loop()
     else if (mode == 1) 
       mode = 2;
     else if (mode == 2)
+      mode = 3; 
+    else if (mode == 3)
+      mode = 4; 
+    else if (mode == 4)
       mode = 0; 
     modeJustChanged = 1;
 
@@ -389,6 +389,8 @@ void loop()
   Serial.println (strOutput);
 
 }
+
+
 
 
 
