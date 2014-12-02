@@ -27,10 +27,10 @@ A5 = pygame.mixer.Sound("A5.wav")
 B5 = pygame.mixer.Sound("B5.wav")
 C6 = pygame.mixer.Sound("C6.wav")
 
-M1 = pygame.mixer.Sound("Mario 1")
-M2 = pygame.mixer.Sound("Mario 2")
-M3 = pygame.mixer.Sound("Mario 3")
-M4 = pygame.mixer.Sound("Mario 4")
+M1 = pygame.mixer.Sound("mario_itsme.wav")
+M2 = pygame.mixer.Sound("mario_haha.wav")
+M3 = pygame.mixer.Sound("mario_jump2.wav")
+M4 = pygame.mixer.Sound("mario_powerup.wav")
 
 previousThumb = 0
 
@@ -136,12 +136,12 @@ while True:
 			
 			if values[5] == 0 and previousThumb == 1:
 				pygame.mixer.music.stop()
-				pygame.mixer.music.load("MARIO HERE")
+				pygame.mixer.music.load("mario_song.wav")
 				pygame.mixer.music.play(-1,0)
 				
 			elif values[5] == 1 and previousThumb == 0:
 				pygame.mixer.music.stop()
-				pygame.mixer.music.load("MARIO STAR")
+				pygame.mixer.music.load("mario_starsong.wav")
 				pygame.mixer.music.play(-1,0)
 
 			if values[6] == 1 and notePlayed[0] == False:
@@ -162,6 +162,7 @@ while True:
 					notePlayed[x] = False
 
 			previousThumb = values[5]
+
 
 		#SOUND EFFECT MODE
 		elif values[7] == 2 and values[8] == 0:
