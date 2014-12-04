@@ -141,18 +141,18 @@ while True:
 				pygame.mixer.music.stop()
 				pygame.mixer.music.load("mario_starsong.wav")
 				pygame.mixer.music.play(-1,0)
-				if values[6] == 1 and notePlayed[0] == False:
-					M1.play()
-					notePlayed[0] = True
-				if values[6] == 2 and notePlayed[1] == False:
-					M2.play()
-					notePlayed[1] = True
-				if values[6] == 3 and notePlayed[2] == False:
-					M3.play()
-					notePlayed[2] = True
-				if values[6] == 4 and notePlayed[3] == False:
-					M4.play()
-					notePlayed[3] = True
+			if values[6] == 1 and notePlayed[0] == False:
+				M1.play()
+				notePlayed[0] = True
+			if values[6] == 2 and notePlayed[1] == False:
+				M2.play()
+				notePlayed[1] = True
+			if values[6] == 3 and notePlayed[2] == False:
+				M3.play()
+				notePlayed[2] = True
+			if values[6] == 4 and notePlayed[3] == False:
+				M4.play()
+				notePlayed[3] = True
 
 			for x in range(0,4):
 				if threshMet[x] == False:
