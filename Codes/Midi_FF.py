@@ -5,7 +5,10 @@ import serial
 import time
 
 pygame.mixer.init()
-ch1 = pygame.mixer.Channel()
+ch = []
+
+for x in range(8):
+	ch.append(pygame.mixer.Channel(x))
 
 ser = serial.Serial('/dev/ttyACM0', 9600)
 print "Initializing MIDI Glove"
@@ -32,7 +35,7 @@ M2 = pygame.mixer.Sound("mario_haha.wav")
 M3 = pygame.mixer.Sound("mario_jump2.wav")
 M4 = pygame.mixer.Sound("mario_powerup.wav")
 
-previousThumb = 0
+previousThumb = 1
 
 ######################################
 # Values note 			     #
@@ -56,7 +59,7 @@ previousThumb = 0
 
 def checkThresholds(list):
 	counter = 0
-	thresholds = [350,350,330,370,400]
+	thresholds = [300,612,270,622,370]
 	threshMet = [True,True,True,True,True]
 	for x in list:
 		if counter < 5:
@@ -71,7 +74,7 @@ def checkThresholds(list):
 
 while True:
 	line =  ser.readline()
-	if len(line) > 27 and len(line) < 32:
+	if len(line) > 45 and len(line) < 70:
 		values = line.split()
 		counter = 0
 		for x in values:
@@ -79,9 +82,7 @@ while True:
 			counter = counter + 1
 		threshMet = checkThresholds(values)
 
-		
 		if values[8] == 1 and soundPlayed == False:
-			
 			if values[7] == 0:
 				modeSound = pygame.mixer.Sound("Piano Mode.wav")			
 			elif values[7] == 1:
@@ -97,7 +98,6 @@ while True:
 				soundPlayed = True
 		elif values[8] == 0:
 			soundPlayed = False
-
 		#PIANO MODE
 		if values[7] == 0 and values[8] == 0:
 			pygame.mixer.music.stop()
@@ -132,19 +132,16 @@ while True:
 					notePlayed[x] = False
 
 		#MARIO MODE
-		elif values[7] == 1 and values[8] == 0:
-			
+		elif values[7] == 1 and values[8] == 0:	
 			if values[5] == 0 and previousThumb == 1:
 				pygame.mixer.music.stop()
 				pygame.mixer.music.load("mario_song.wav")
 				pygame.mixer.music.play(-1,0)
-				
 			elif values[5] == 1 and previousThumb == 0:
 				pygame.mixer.music.stop()
 				pygame.mixer.music.load("mario_starsong.wav")
 				pygame.mixer.music.play(-1,0)
-
-			if values[6] == 1 and notePlayed[0] == False:
+				if values[6] == 1 and notePlayed[0] == False:
 					M1.play()
 					notePlayed[0] = True
 				if values[6] == 2 and notePlayed[1] == False:
@@ -177,21 +174,22 @@ while True:
 		
 		#GAME OF THRONES MODE
 		elif values[7] == 3 and values[8] == 0:
-
+			print "nothing"
 		#VOLUME MODE
 		elif values[7] == 4 and values[8] == 0:
 			pygame.mixer.music.stop()
-			pygame.music.load("Volume.wav")
-			pygame.music.play(-1,0)
-			
-			volLevel = (abs(values[10]-3000)) / 13000
+			vol = pygame.mixer.Sound("Volume.wav")
+			vol.play()
+			if values[10] > 20000:
+				volLevel = 0
+			else:
+				volLevel = (abs(values[10]-3000.0)) / 13000.0
 			if volLevel > 1:
 				volLevel = 1
+			
+			for x in ch:
+				x.set_volume(volLevel)
 
-			channel.set_volume(volLevel)
-			print volLevel
-
-		#MARACA(S) MODE
 
 			
 	
