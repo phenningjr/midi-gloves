@@ -29,6 +29,16 @@ G5 = pygame.mixer.Sound("G5.wav")
 A5 = pygame.mixer.Sound("A5.wav")
 B5 = pygame.mixer.Sound("B5.wav")
 C6 = pygame.mixer.Sound("C6.wav")
+CelloBb3 = pygame.mixer.Sound("CelloBb3.wav")
+CelloC4 = pygame.mixer.Sound("CelloC4.wav")
+CelloD4 = pygame.mixer.Sound("CelloD4.wav")
+CelloE4 = pygame.mixer.Sound("CelloE4.wav")
+CelloEb4 = pygame.mixer.Sound("CelloEb4.wav")
+CelloF4 = pygame.mixer.Sound("CelloF4.wav")
+CelloG3 = pygame.mixer.Sound("CelloG3.wav")
+CelloG4 = pygame.mixer.Sound("CelloG4.wav")
+
+vol = pygame.mixer.Sound("Volume.wav")
 
 M1 = pygame.mixer.Sound("mario_itsme.wav")
 M2 = pygame.mixer.Sound("mario_haha.wav")
@@ -59,7 +69,7 @@ previousThumb = 1
 
 def checkThresholds(list):
 	counter = 0
-	thresholds = [300,612,270,622,370]
+	thresholds = [300,618,280,625,370]
 	threshMet = [True,True,True,True,True]
 	for x in list:
 		if counter < 5:
@@ -94,38 +104,40 @@ while True:
 			elif values[7] == 4:
 				modeSound = pygame.mixer.Sound("Volume Mode.wav")
 			if soundPlayed == False:
+				pygame.mixer.music.stop()
 				modeSound.play()
 				soundPlayed = True
 		elif values[8] == 0:
 			soundPlayed = False
 		#PIANO MODE
 		if values[7] == 0 and values[8] == 0:
-			pygame.mixer.music.stop()
+			vol.stop()
+			print "Piano Mode"
 			if values[5] == 0:
 				if values[6] == 1 and notePlayed[0] == False:
-					C5.play()
+					ch[0].play(C5)
 					notePlayed[0] = True
 				if values[6] == 2 and notePlayed[1] == False:
-					D5.play()
+					ch[1].play(D5)
 					notePlayed[1] = True
 				if values[6] == 3 and notePlayed[2] == False:
-					E5.play()
+					ch[2].play(E5)
 					notePlayed[2] = True
 				if values[6] == 4 and notePlayed[3] == False:
-					F5.play()
+					ch[3].play(F5)
 					notePlayed[3] = True
 			elif values[5] == 1:
 				if values[6] == 1 and notePlayed[0] == False:
-					G5.play()
+					ch[4].play(G5)
 					notePlayed[0] = True
 				if values[6] == 2 and notePlayed[1] == False:
-					A5.play()
+					ch[5].play(A5)
 					notePlayed[1] = True
 				if values[6] == 3 and notePlayed[2] == False:
-					B5.play()
+					ch[6].play(B5)
 					notePlayed[2] = True
 				if values[6] == 4 and notePlayed[3] == False:
-					C6.play()
+					ch[7].play(C6)
 					notePlayed[3] = True
 			for x in range(0,4):
 				if threshMet[x] == False:
@@ -133,25 +145,28 @@ while True:
 
 		#MARIO MODE
 		elif values[7] == 1 and values[8] == 0:	
+			print "Mario Mode"
 			if values[5] == 0 and previousThumb == 1:
 				pygame.mixer.music.stop()
-				pygame.mixer.music.load("mario_song.wav")
+				pygame.mixer.music.load("mario_tsong.wav")
+				pygame.mixer.music.set_volume(ch[0].get_volume())
 				pygame.mixer.music.play(-1,0)
 			elif values[5] == 1 and previousThumb == 0:
 				pygame.mixer.music.stop()
 				pygame.mixer.music.load("mario_starsong.wav")
+				pygame.mixer.music.set_volume(ch[0].get_volume())
 				pygame.mixer.music.play(-1,0)
 			if values[6] == 1 and notePlayed[0] == False:
-				M1.play()
+				ch[0].play(M1)
 				notePlayed[0] = True
 			if values[6] == 2 and notePlayed[1] == False:
-				M2.play()
+				ch[1].play(M2)
 				notePlayed[1] = True
 			if values[6] == 3 and notePlayed[2] == False:
-				M3.play()
+				ch[2].play(M3)
 				notePlayed[2] = True
 			if values[6] == 4 and notePlayed[3] == False:
-				M4.play()
+				ch[3].play(M4)
 				notePlayed[3] = True
 
 			for x in range(0,4):
@@ -163,22 +178,51 @@ while True:
 
 		#SOUND EFFECT MODE
 		elif values[7] == 2 and values[8] == 0:
-			pygame.mixer.music.stop()
+			print "Sound Effect"
 			if gun_ready == True and threshMet[2] and threshMet[3] and threshMet[1] and values[8] == 0:
 				print("AHHHH")
 				gun_ready = False
-				pygame.mixer.music.load("gun.wav")
-				pygame.mixer.music.play()
+				gun = pygame.mixer.Sound("gun.wav")
+				ch[1].play(gun)
 			if threshMet[1] == False:
 				gun_ready = True
 		
 		#GAME OF THRONES MODE
 		elif values[7] == 3 and values[8] == 0:
-			print "nothing"
+			print"Game of Thrones"
+			if values[5] == 0:
+				if values[6] == 1 and notePlayed[0] == False:
+					ch[0].play(CelloG4)
+					notePlayed[0] = True
+				if values[6] == 2 and notePlayed[1] == False:
+					ch[1].play(CelloF4)
+					notePlayed[1] = True
+				if values[6] == 3 and notePlayed[2] == False:
+					ch[2].play(CelloEb4)
+					notePlayed[2] = True
+				if values[6] == 4 and notePlayed[3] == False:
+					ch[3].play(CelloC4)
+					notePlayed[3] = True
+			elif values[5] == 1:
+				if values[6] == 1 and notePlayed[0] == False:
+					ch[0].play(CelloD4)
+					notePlayed[0] = True
+				if values[6] == 2 and notePlayed[1] == False:
+					ch[1].play(CelloBb3)
+					notePlayed[1] = True
+				if values[6] == 3 and notePlayed[2] == False:
+					ch[2].play(CelloE4)
+					notePlayed[2] = True
+				if values[6] == 4 and notePlayed[3] == False:
+					ch[3].play(CelloG3)
+					notePlayed[3] = True
+			for x in range(0,4):
+				if threshMet[x] == False:
+					notePlayed[x] = False
+					ch[x].stop()
 		#VOLUME MODE
 		elif values[7] == 4 and values[8] == 0:
-			pygame.mixer.music.stop()
-			vol = pygame.mixer.Sound("Volume.wav")
+			print "Volume Mode"
 			vol.play()
 			if values[10] > 20000:
 				volLevel = 0
